@@ -6,12 +6,6 @@ export default function PromoCode({ userEmail, onComplete }) {
   const [loading, setLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
-  // -------------------------------------------------------------
-  // 🔑 CHANGE YOUR PROMO CODES HERE WHENEVER YOU WANT!
-  // You can add one or multiple valid promo codes in this array.
-  // -------------------------------------------------------------
-  const VALID_PROMO_CODES = ['DEANVIP2026', 'GYMGAINS', 'DEAN50']
-
   const handleRedeem = async (e) => {
     e.preventDefault()
     setLoading(true)
@@ -19,17 +13,30 @@ export default function PromoCode({ userEmail, onComplete }) {
 
     const formattedCode = code.trim().toUpperCase()
 
-    if (VALID_PROMO_CODES.includes(formattedCode)) {
-      // Save user as active premium in Supabase
-      const { error } = await supabase
+    // 1. Check if the code exists in your Supabase 'promo_codes' table
+    const { data, error } = await supabase
+      .from('promo_codes')
+      .select('code')
+      .eq('code', formattedCode)
+      .maybeSingle()
+
+    if (error) {
+      setErrorMsg('Database error: ' + error.message)
+      setLoading(false)
+      return
+    }
+
+    if (data) {
+      // 2. Save user as active premium in Supabase
+      const { error: upgradeError } = await supabase
         .from('premium_users')
         .upsert({ email: userEmail, status: 'active' })
 
-      if (error) {
-        setErrorMsg('Database error: ' + error.message)
+      if (upgradeError) {
+        setErrorMsg('Database error: ' + upgradeError.message)
       } else {
         alert('⚡ PROMO CODE ACCEPTED! VIP ACCESS UNLOCKED.')
-        onComplete(true) // Set as premium
+        onComplete(true)
       }
     } else {
       setErrorMsg('Invalid Promo Code. Please try again or skip.')
@@ -55,8 +62,8 @@ export default function PromoCode({ userEmail, onComplete }) {
             type="text"
             value={code}
             onChange={(e) => setCode(e.target.value)}
-            placeholder="e.g. DEANVIP2026"
-            className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-center text-lg font-black tracking-widest text-yellow-400 uppercase placeholder-zinc-600 outline-none focus:border-yellow-400"
+            placeholder=""
+            className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-center text-lg font-black tracking-widest text-yellow-400 uppercase outline-none focus:border-yellow-400"
             required
           />
 
@@ -71,7 +78,6 @@ export default function PromoCode({ userEmail, onComplete }) {
           </button>
         </form>
 
-        {/* Skip button for non-paying users */}
         <button
           type="button"
           onClick={() => onComplete(false)}
