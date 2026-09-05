@@ -4,6 +4,7 @@ import Auth from './components/Auth'
 import Layout from './components/Layout'
 import Onboarding from './components/Onboarding'
 import Dashboard from './components/Dashboard'
+import PromoCode from './components/PromoCode' // Import component
 
 export default function App() {
   const [session, setSession] = useState(null)
@@ -11,6 +12,7 @@ export default function App() {
   const [hasProfile, setHasProfile] = useState(false)
   const [activeTab, setActiveTab] = useState('HOME')
   const [isPremium, setIsPremium] = useState(false)
+  const [checkedPromo, setCheckedPromo] = useState(false)
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -56,10 +58,25 @@ export default function App() {
     )
   }
 
+  // 1. Show Auth screen if not logged in
   if (!session) {
     return <Auth />
   }
 
+  // 2. Ask for Promo Code right after login if not already premium
+  if (!isPremium && !checkedPromo) {
+    return (
+      <PromoCode
+        userEmail={session.user.email}
+        onComplete={(unlocked) => {
+          if (unlocked) setIsPremium(true)
+          setCheckedPromo(true)
+        }}
+      />
+    )
+  }
+
+  // 3. Complete Onboarding if first time
   if (!hasProfile) {
     return (
       <Onboarding
@@ -69,6 +86,7 @@ export default function App() {
     )
   }
 
+  // 4. Main App
   return (
     <Layout
       activeTab={activeTab}
@@ -77,31 +95,7 @@ export default function App() {
       onSignOut={() => supabase.auth.signOut()}
     >
       {activeTab === 'HOME' && <Dashboard session={session} />}
-      {activeTab === 'WORKOUT' && (
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 text-yellow-400 font-bold uppercase">
-          Workout Tracker & Custom Routines Tab (Ready for Step 6)
-        </div>
-      )}
-      {activeTab === 'EXERCISES' && (
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 text-yellow-400 font-bold uppercase">
-          Complete Exercise Library Tab (Ready for Step 7)
-        </div>
-      )}
-      {activeTab === 'NUTRITION' && (
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 text-yellow-400 font-bold uppercase">
-          Real-time Calorie & Macro Tracker Tab (Ready for Step 8)
-        </div>
-      )}
-      {activeTab === 'PROGRESS' && (
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 text-yellow-400 font-bold uppercase">
-          Progress & PR Analytics Tab (Ready for Step 9)
-        </div>
-      )}
-      {activeTab === 'PROFILE' && (
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 text-yellow-400 font-bold uppercase">
-          Athlete Profile & Settings Tab (Ready for Step 10)
-        </div>
-      )}
+      {/* ... Other tabs ... */}
     </Layout>
   )
 }
