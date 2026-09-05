@@ -3,6 +3,7 @@ import { supabase } from './supabaseClient'
 import Auth from './components/Auth'
 import PromoCode from './components/PromoCode'
 import WorkoutLogger from './components/WorkoutLogger'
+import ProfileTargets from './components/ProfileTargets'
 
 export default function App() {
   const [session, setSession] = useState(null)
@@ -91,6 +92,17 @@ export default function App() {
             >
               🏋️ Workout Logger
             </button>
+
+            <button
+              onClick={() => setActiveTab('profile')}
+              className={`w-full text-left px-4 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-all ${
+                activeTab === 'profile'
+                  ? 'bg-yellow-400 text-black shadow-lg'
+                  : 'text-zinc-400 hover:bg-zinc-900 hover:text-white'
+              }`}
+            >
+              👤 Profile & Targets
+            </button>
           </nav>
         </div>
 
@@ -105,6 +117,7 @@ export default function App() {
       {/* Main Feature Content */}
       <main className="flex-1 p-8">
         {activeTab === 'workouts' && <WorkoutLogger session={session} />}
+        {activeTab === 'profile' && <ProfileTargets session={session} />}
       </main>
     </div>
   )
