@@ -2,17 +2,16 @@ import { useState, useEffect } from 'react'
 import { supabase } from './supabaseClient'
 
 export default function App() {
-  // --- AUTH STATE ---
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
   const [isLoginView, setIsLoginView] = useState(true)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [authError, setAuthError] = useState('')
 
-  // --- APP STATE ---
+  // Dashboard state
   const [activeTab, setActiveTab] = useState('workouts')
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false) // Mobile Menu Toggle
   const [exercise, setExercise] = useState('Barbell Bench Press (Chest)')
   const [weight, setWeight] = useState('')
   const [reps, setReps] = useState('')
@@ -70,134 +69,347 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-black text-[#FFC107] font-black tracking-widest uppercase">
-        LOADING...
+      <div style={{
+        minHeight: '100vh',
+        backgroundColor: '#000000',
+        color: '#FFC107',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: 'sans-serif',
+        fontWeight: '900',
+        letterSpacing: '2px'
+      }}>
+        LOADING FITNESS DEAN...
       </div>
     )
   }
 
-  // ==========================================
-  // 1. RESPONSIVE LOGIN SCREEN
-  // ==========================================
+  // ========================================================
+  // 1. FIRST PAGE: EXACT LOGIN DESIGN FROM IMAGE 1
+  // ========================================================
   if (!session) {
     return (
-      <div className="flex min-h-screen bg-black items-center justify-center p-4 md:p-6 font-sans text-zinc-100">
-        <div className="w-full max-w-[420px] flex flex-col items-center">
+      <div style={{
+        minHeight: '100vh',
+        backgroundColor: '#000000',
+        color: '#ffffff',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px',
+        fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+      }}>
+        <div style={{ width: '100%', maxWidth: '440px', textAlign: 'center' }}>
           
-          <div className="mb-6 md:mb-8 text-center flex flex-col items-center">
-            <span className="rounded-full bg-[#FFC107]/10 border border-[#FFC107]/30 px-3 py-1 text-[10px] md:text-xs font-black text-[#FFC107] uppercase tracking-wider mb-4 md:mb-6 flex items-center gap-2">
+          {/* Badge */}
+          <div style={{ display: 'inline-block', marginBottom: '16px' }}>
+            <span style={{
+              backgroundColor: 'rgba(255, 193, 7, 0.08)',
+              border: '1px solid rgba(255, 193, 7, 0.3)',
+              color: '#FFC107',
+              fontSize: '11px',
+              fontWeight: '900',
+              textTransform: 'uppercase',
+              letterSpacing: '1px',
+              padding: '6px 16px',
+              borderRadius: '9999px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}>
               ⚡ FITNESS DEAN GYM
             </span>
-            <h1 className="text-3xl md:text-4xl font-black text-[#FFC107] italic uppercase leading-tight mb-3 md:mb-4">
-              NO EXCUSES. JUST<br/>GAINS.
-            </h1>
-            <p className="text-xs md:text-sm text-zinc-400 px-4">Sign in to access your workouts and manage your membership.</p>
           </div>
-          
-          <div className="w-full p-5 md:p-8 rounded-2xl border border-zinc-800 bg-[#0a0a0a] shadow-2xl">
+
+          {/* Main Title */}
+          <h1 style={{
+            fontSize: '36px',
+            fontWeight: '900',
+            color: '#FFC107',
+            fontStyle: 'italic',
+            textTransform: 'uppercase',
+            lineHeight: '1.1',
+            marginBottom: '12px',
+            letterSpacing: '0.5px'
+          }}>
+            NO EXCUSES. JUST<br />GAINS.
+          </h1>
+
+          {/* Subtitle */}
+          <p style={{
+            color: '#a1a1aa',
+            fontSize: '14px',
+            marginBottom: '28px'
+          }}>
+            Sign in to access your workouts and manage your membership.
+          </p>
+
+          {/* Main Card */}
+          <div style={{
+            backgroundColor: '#0c0c0e',
+            border: '1px solid #27272a',
+            borderRadius: '16px',
+            padding: '28px',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
+            textAlign: 'left'
+          }}>
+            
             {/* Toggle Switch */}
-            <div className="flex bg-[#1a1a1a] rounded-lg p-1 mb-6 md:mb-8">
-              <button 
+            <div style={{
+              display: 'flex',
+              backgroundColor: '#18181b',
+              borderRadius: '8px',
+              padding: '4px',
+              marginBottom: '24px'
+            }}>
+              <button
+                type="button"
                 onClick={() => setIsLoginView(true)}
-                className={`flex-1 py-2.5 text-[10px] md:text-xs font-bold uppercase rounded-md transition-colors ${isLoginView ? 'bg-[#FFC107] text-black' : 'text-zinc-500 hover:text-white'}`}
+                style={{
+                  flex: 1,
+                  padding: '10px 0',
+                  fontSize: '11px',
+                  fontWeight: '800',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  borderRadius: '6px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  backgroundColor: isLoginView ? '#FFC107' : 'transparent',
+                  color: isLoginView ? '#000000' : '#71717a'
+                }}
               >
                 SIGN IN
               </button>
-              <button 
+              <button
+                type="button"
                 onClick={() => setIsLoginView(false)}
-                className={`flex-1 py-2.5 text-[10px] md:text-xs font-bold uppercase rounded-md transition-colors ${!isLoginView ? 'bg-[#FFC107] text-black' : 'text-zinc-500 hover:text-white'}`}
+                style={{
+                  flex: 1,
+                  padding: '10px 0',
+                  fontSize: '11px',
+                  fontWeight: '800',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  borderRadius: '6px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  backgroundColor: !isLoginView ? '#FFC107' : 'transparent',
+                  color: !isLoginView ? '#000000' : '#71717a'
+                }}
               >
                 CREATE ACCOUNT
               </button>
             </div>
 
-            <form onSubmit={handleAuth} className="space-y-4 md:space-y-5">
-              {authError && <div className="p-3 rounded bg-red-900/30 border border-red-900 text-red-500 text-xs font-bold">{authError}</div>}
-              
-              <div>
-                <label className="block text-[10px] md:text-xs font-bold text-[#FFC107] uppercase tracking-wider mb-2">EMAIL ADDRESS</label>
+            <form onSubmit={handleAuth}>
+              {authError && (
+                <div style={{
+                  padding: '10px 14px',
+                  backgroundColor: 'rgba(127, 29, 29, 0.4)',
+                  border: '1px solid #7f1d1d',
+                  borderRadius: '8px',
+                  color: '#f87171',
+                  fontSize: '12px',
+                  fontWeight: '700',
+                  marginBottom: '16px'
+                }}>
+                  {authError}
+                </div>
+              )}
+
+              {/* Email Address Input */}
+              <div style={{ marginBottom: '18px' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '11px',
+                  fontWeight: '800',
+                  color: '#FFC107',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.8px',
+                  marginBottom: '8px'
+                }}>
+                  EMAIL ADDRESS
+                </label>
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-lg border border-zinc-800 bg-[#141414] px-4 py-3 text-sm text-zinc-100 outline-none focus:border-[#FFC107]"
                   placeholder="athlete@fitnessdean.com"
+                  style={{
+                    width: '100%',
+                    backgroundColor: '#141416',
+                    border: '1px solid #27272a',
+                    borderRadius: '8px',
+                    padding: '12px 14px',
+                    fontSize: '14px',
+                    color: '#ffffff',
+                    outline: 'none',
+                    boxSizing: 'border-box'
+                  }}
                 />
               </div>
-              
-              <div>
-                <label className="block text-[10px] md:text-xs font-bold text-[#FFC107] uppercase tracking-wider mb-2">PASSWORD</label>
-                <div className="relative">
+
+              {/* Password Input */}
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '11px',
+                  fontWeight: '800',
+                  color: '#FFC107',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.8px',
+                  marginBottom: '8px'
+                }}>
+                  PASSWORD
+                </label>
+                <div style={{ position: 'relative' }}>
                   <input
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-lg border border-zinc-800 bg-[#141414] px-4 py-3 text-sm text-zinc-100 outline-none focus:border-[#FFC107]"
                     placeholder="••••••••"
+                    style={{
+                      width: '100%',
+                      backgroundColor: '#141416',
+                      border: '1px solid #27272a',
+                      borderRadius: '8px',
+                      padding: '12px 42px 12px 14px',
+                      fontSize: '14px',
+                      color: '#ffffff',
+                      outline: 'none',
+                      boxSizing: 'border-box'
+                    }}
                   />
-                  <span className="absolute right-4 top-3 text-zinc-500">👁️</span>
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      color: '#71717a',
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      padding: '0'
+                    }}
+                  >
+                    {showPassword ? '🙈' : '👁️'}
+                  </button>
                 </div>
               </div>
-              
-              <button type="submit" className="w-full rounded-lg bg-[#FFC107] py-3.5 md:py-4 text-xs md:text-sm font-black uppercase text-black hover:bg-yellow-400 transition-colors mt-2 md:mt-4 shadow-[0_0_15px_rgba(255,193,7,0.2)]">
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                style={{
+                  width: '100%',
+                  backgroundColor: '#FFC107',
+                  color: '#000000',
+                  fontWeight: '900',
+                  fontSize: '13px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  padding: '14px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 14px rgba(255, 193, 7, 0.25)',
+                  marginTop: '6px'
+                }}
+              >
                 ENTER FITNESS DEAN GYM
               </button>
             </form>
 
-            <div className="mt-5 md:mt-6 text-center">
-              <button onClick={() => setIsLoginView(!isLoginView)} className="text-[10px] md:text-xs text-zinc-500 hover:text-zinc-300">
+            {/* Toggle Link */}
+            <div style={{ textAlign: 'center', marginTop: '16px' }}>
+              <button
+                type="button"
+                onClick={() => setIsLoginView(!isLoginView)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#71717a',
+                  fontSize: '12px',
+                  cursor: 'pointer'
+                }}
+              >
                 {isLoginView ? "Don't have an account? Create Account" : "Already have an account? Sign In"}
               </button>
             </div>
+
+            {/* Perks Box */}
+            <div style={{
+              marginTop: '20px',
+              padding: '10px 14px',
+              backgroundColor: '#121215',
+              border: '1px solid #27272a',
+              borderRadius: '8px',
+              textAlign: 'center',
+              fontSize: '11px'
+            }}>
+              <span style={{ color: '#FFC107', fontWeight: '800' }}>Fitness Dean Perks: </span>
+              <span style={{ color: '#a1a1aa' }}>24/7 Access • Heavy Iron • Personal Coaching</span>
+            </div>
+
           </div>
         </div>
       </div>
     )
   }
 
-  // ==========================================
-  // 2. RESPONSIVE DASHBOARD SCREEN
-  // ==========================================
+  // ========================================================
+  // 2. MAIN DASHBOARD (AFTER LOGIN)
+  // ========================================================
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-black text-zinc-100 font-sans w-full overflow-hidden">
-      
-      {/* MOBILE HEADER (Only visible on small screens) */}
-      <div className="md:hidden flex items-center justify-between p-4 border-b border-zinc-800/60 bg-[#0a0a0a] sticky top-0 z-30">
-        <div className="flex items-center gap-2">
-          <h1 className="text-lg font-black text-[#FFC107] italic uppercase">FITNESS DEAN</h1>
-          <span className="rounded bg-[#FFC107]/20 border border-[#FFC107]/40 px-1 py-0.5 text-[8px] font-black text-[#FFC107] uppercase">PRO</span>
-        </div>
-        <button 
-          onClick={() => setIsMobileMenuOpen(true)} 
-          className="text-[#FFC107] p-1 focus:outline-none"
-        >
-          {/* Hamburger Icon */}
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-        </button>
-      </div>
-
-      {/* MOBILE OVERLAY BACKGROUND */}
-      {isMobileMenuOpen && (
-        <div 
-          className="fixed inset-0 z-40 bg-black/80 backdrop-blur-sm md:hidden"
-          onClick={() => setIsMobileMenuOpen(false)}
-        ></div>
-      )}
-
-      {/* SIDEBAR (Slide-in on Mobile, Fixed left on Desktop) */}
-      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-[#050505] border-r border-zinc-800/60 p-6 flex flex-col justify-between transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+    <div style={{
+      minHeight: '100vh',
+      backgroundColor: '#000000',
+      color: '#ffffff',
+      display: 'flex',
+      flexDirection: 'row',
+      fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    }}>
+      {/* Sidebar */}
+      <aside style={{
+        width: '260px',
+        borderRight: '1px solid #1f1f23',
+        padding: '24px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        backgroundColor: '#050505',
+        flexShrink: 0
+      }}>
         <div>
-          <div className="flex items-center justify-between md:justify-start gap-3">
-            <h1 className="text-xl font-black text-[#FFC107] italic uppercase">FITNESS DEAN</h1>
-            <button className="md:hidden text-zinc-500 hover:text-white" onClick={() => setIsMobileMenuOpen(false)}>
-              ✕
-            </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <h1 style={{ fontSize: '18px', fontWeight: '900', color: '#FFC107', fontStyle: 'italic', textTransform: 'uppercase', margin: 0 }}>
+              FITNESS DEAN
+            </h1>
+            <span style={{
+              backgroundColor: 'rgba(255, 193, 7, 0.15)',
+              border: '1px solid rgba(255, 193, 7, 0.3)',
+              padding: '2px 6px',
+              fontSize: '9px',
+              fontWeight: '900',
+              color: '#FFC107',
+              borderRadius: '4px'
+            }}>PRO</span>
           </div>
-          <p className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1 mb-8">PORTAL V1.0</p>
+          <p style={{ fontSize: '10px', color: '#52525b', textTransform: 'uppercase', letterSpacing: '2px', marginTop: '4px', marginBottom: '32px' }}>
+            PORTAL V1.0
+          </p>
 
-          <nav className="space-y-1">
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             {[
               { id: 'dashboard', label: 'DASHBOARD' },
               { id: 'workouts', label: 'WORKOUT LOGGER' },
@@ -208,15 +420,22 @@ export default function App() {
             ].map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => {
-                  setActiveTab(tab.id);
-                  setIsMobileMenuOpen(false); // Close menu on click in mobile
+                onClick={() => setActiveTab(tab.id)}
+                style={{
+                  width: '100%',
+                  textAlign: 'left',
+                  padding: '12px 16px',
+                  borderRadius: '10px',
+                  fontWeight: '800',
+                  fontSize: '11px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.8px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  backgroundColor: activeTab === tab.id ? '#FFC107' : 'transparent',
+                  color: activeTab === tab.id ? '#000000' : '#a1a1aa',
+                  transition: 'all 0.2s'
                 }}
-                className={`w-full text-left px-4 py-3.5 rounded-xl font-bold text-[11px] md:text-xs uppercase tracking-wider transition-all ${
-                  activeTab === tab.id
-                    ? 'bg-[#FFC107] text-black shadow-lg shadow-[#FFC107]/10'
-                    : 'text-zinc-400 hover:bg-zinc-900 hover:text-white'
-                }`}
               >
                 {tab.label}
               </button>
@@ -224,86 +443,179 @@ export default function App() {
           </nav>
         </div>
 
-        <div className="space-y-3 mt-8">
-          <button className="w-full py-3 rounded-xl border border-[#FFC107]/30 text-[10px] md:text-xs font-bold text-[#FFC107] hover:bg-[#FFC107]/10 transition-colors uppercase tracking-wider">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '24px' }}>
+          <button style={{
+            padding: '12px',
+            borderRadius: '10px',
+            border: '1px solid rgba(255, 193, 7, 0.3)',
+            color: '#FFC107',
+            backgroundColor: 'transparent',
+            fontSize: '11px',
+            fontWeight: '800',
+            cursor: 'pointer',
+            textTransform: 'uppercase'
+          }}>
             SCAN QR FOR MOBILE
           </button>
           <button
             onClick={() => supabase.auth.signOut()}
-            className="w-full py-3 rounded-xl border border-zinc-800 text-[10px] md:text-xs font-bold text-zinc-500 hover:bg-zinc-900 hover:text-white transition-colors uppercase tracking-wider"
+            style={{
+              padding: '12px',
+              borderRadius: '10px',
+              border: '1px solid #27272a',
+              color: '#71717a',
+              backgroundColor: 'transparent',
+              fontSize: '11px',
+              fontWeight: '800',
+              cursor: 'pointer',
+              textTransform: 'uppercase'
+            }}
           >
             SIGN OUT
           </button>
         </div>
       </aside>
 
-      {/* MAIN CONTENT AREA */}
-      <main className="flex-1 p-4 md:p-8 overflow-y-auto bg-black w-full">
-        
+      {/* Main Content */}
+      <main style={{ flex: 1, padding: '32px', backgroundColor: '#000000', overflowY: 'auto' }}>
         {activeTab === 'workouts' && (
-          <div className="w-full max-w-3xl space-y-4 md:space-y-6 mx-auto md:mx-0">
+          <div style={{ maxWidth: '720px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
             
-            {/* LOGGER FORM */}
-            <div className="rounded-2xl border border-zinc-800/60 bg-[#0a0a0a] p-5 md:p-6 shadow-xl">
-              <h2 className="text-lg md:text-xl font-black italic text-[#FFC107] uppercase mb-1">WORKOUT LOGGER</h2>
-              <p className="text-[11px] md:text-xs text-zinc-400 mb-5 md:mb-6">Log your weight and reps to build training volume.</p>
-              
-              <form onSubmit={handleAddWorkout} className="space-y-4 md:space-y-5">
+            {/* Workout Form */}
+            <div style={{
+              backgroundColor: '#0c0c0e',
+              border: '1px solid #27272a',
+              borderRadius: '16px',
+              padding: '24px'
+            }}>
+              <h2 style={{ fontSize: '20px', fontWeight: '900', color: '#FFC107', fontStyle: 'italic', textTransform: 'uppercase', margin: '0 0 4px 0' }}>
+                WORKOUT LOGGER
+              </h2>
+              <p style={{ fontSize: '12px', color: '#71717a', margin: '0 0 20px 0' }}>
+                Log your weight and reps to build training volume.
+              </p>
+
+              <form onSubmit={handleAddWorkout} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div>
-                  <label className="block text-[10px] md:text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-2">SELECT EXERCISE</label>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: '#a1a1aa', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px' }}>
+                    SELECT EXERCISE
+                  </label>
                   <select
                     value={exercise}
                     onChange={(e) => setExercise(e.target.value)}
-                    className="w-full rounded-xl border border-zinc-800 bg-[#141414] px-3 md:px-4 py-3 md:py-3.5 text-xs md:text-sm text-zinc-100 outline-none focus:border-[#FFC107] appearance-none"
+                    style={{
+                      width: '100%',
+                      backgroundColor: '#141416',
+                      border: '1px solid #27272a',
+                      borderRadius: '10px',
+                      padding: '12px 14px',
+                      fontSize: '13px',
+                      color: '#ffffff',
+                      outline: 'none'
+                    }}
                   >
                     {EXERCISES.map((ex, idx) => (
-                      <option key={idx} value={ex}>{ex}</option>
+                      <option key={idx} value={ex} style={{ backgroundColor: '#141416', color: '#fff' }}>{ex}</option>
                     ))}
                   </select>
                 </div>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                   <div>
-                    <label className="block text-[10px] md:text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-2">WEIGHT (KG)</label>
+                    <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: '#a1a1aa', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px' }}>
+                      WEIGHT (KG)
+                    </label>
                     <input
                       type="number"
                       placeholder="e.g. 80"
                       value={weight}
                       onChange={(e) => setWeight(e.target.value)}
-                      className="w-full rounded-xl border border-zinc-800 bg-[#141414] px-3 md:px-4 py-3 md:py-3.5 text-xs md:text-sm text-zinc-100 outline-none focus:border-[#FFC107]"
+                      style={{
+                        width: '100%',
+                        backgroundColor: '#141416',
+                        border: '1px solid #27272a',
+                        borderRadius: '10px',
+                        padding: '12px 14px',
+                        fontSize: '13px',
+                        color: '#ffffff',
+                        outline: 'none',
+                        boxSizing: 'border-box'
+                      }}
                     />
                   </div>
                   <div>
-                    <label className="block text-[10px] md:text-[11px] font-bold text-zinc-400 uppercase tracking-wider mb-2">REPS COMPLETED</label>
+                    <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: '#a1a1aa', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px' }}>
+                      REPS COMPLETED
+                    </label>
                     <input
                       type="number"
                       placeholder="e.g. 10"
                       value={reps}
                       onChange={(e) => setReps(e.target.value)}
-                      className="w-full rounded-xl border border-zinc-800 bg-[#141414] px-3 md:px-4 py-3 md:py-3.5 text-xs md:text-sm text-zinc-100 outline-none focus:border-[#FFC107]"
+                      style={{
+                        width: '100%',
+                        backgroundColor: '#141416',
+                        border: '1px solid #27272a',
+                        borderRadius: '10px',
+                        padding: '12px 14px',
+                        fontSize: '13px',
+                        color: '#ffffff',
+                        outline: 'none',
+                        boxSizing: 'border-box'
+                      }}
                     />
                   </div>
                 </div>
-                
-                <button type="submit" className="w-full rounded-xl bg-[#FFC107] py-3.5 md:py-4 text-xs md:text-sm font-black uppercase text-black hover:bg-yellow-400 transition-colors shadow-[0_0_15px_rgba(255,193,7,0.15)] mt-2">
+
+                <button
+                  type="submit"
+                  style={{
+                    width: '100%',
+                    backgroundColor: '#FFC107',
+                    color: '#000000',
+                    fontWeight: '900',
+                    fontSize: '13px',
+                    textTransform: 'uppercase',
+                    padding: '14px',
+                    borderRadius: '10px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    marginTop: '8px'
+                  }}
+                >
                   + LOG SET NOW
                 </button>
               </form>
             </div>
 
-            {/* HISTORY LIST */}
-            <div className="rounded-2xl border border-zinc-800/60 bg-[#0a0a0a] p-5 md:p-6 shadow-xl">
-              <h3 className="text-[11px] md:text-sm font-black italic text-zinc-300 uppercase tracking-wide mb-4 md:mb-5">LOGGED WORKOUT HISTORY</h3>
-              <div className="space-y-3">
+            {/* History */}
+            <div style={{
+              backgroundColor: '#0c0c0e',
+              border: '1px solid #27272a',
+              borderRadius: '16px',
+              padding: '24px'
+            }}>
+              <h3 style={{ fontSize: '13px', fontWeight: '900', color: '#e4e4e7', fontStyle: 'italic', textTransform: 'uppercase', margin: '0 0 16px 0' }}>
+                LOGGED WORKOUT HISTORY
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {loggedWorkouts.map((item) => (
-                  <div key={item.id} className="flex flex-row justify-between items-center rounded-xl border border-zinc-800/60 bg-[#141414] p-4 md:p-5">
-                    <div className="flex-1 pr-2">
-                      <h4 className="font-bold text-sm md:text-[15px] text-zinc-100 mb-0.5 md:mb-1 truncate">{item.exercise}</h4>
-                      <p className="text-[10px] md:text-xs text-zinc-500">{item.date}</p>
+                  <div key={item.id} style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    backgroundColor: '#141416',
+                    border: '1px solid #27272a',
+                    borderRadius: '12px',
+                    padding: '16px'
+                  }}>
+                    <div style={{ flex: 1 }}>
+                      <h4 style={{ margin: 0, fontWeight: '700', fontSize: '14px', color: '#ffffff' }}>{item.exercise}</h4>
+                      <p style={{ margin: '4px 0 0 0', fontSize: '11px', color: '#71717a' }}>{item.date}</p>
                     </div>
-                    <div className="text-right shrink-0">
-                      <span className="text-[#FFC107] font-black text-base md:text-lg">{item.weight} kg</span>
-                      <span className="text-zinc-400 text-xs md:text-sm ml-1 md:ml-2">× {item.reps} reps</span>
+                    <div style={{ textAlign: 'right' }}>
+                      <span style={{ color: '#FFC107', fontWeight: '900', fontSize: '16px' }}>{item.weight} kg</span>
+                      <span style={{ color: '#a1a1aa', fontSize: '13px', marginLeft: '8px' }}>× {item.reps} reps</span>
                     </div>
                   </div>
                 ))}
@@ -312,7 +624,6 @@ export default function App() {
 
           </div>
         )}
-
       </main>
     </div>
   )
