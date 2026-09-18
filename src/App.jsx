@@ -10,6 +10,9 @@ export default function App() {
   const [showPassword, setShowPassword] = useState(false)
   const [authError, setAuthError] = useState('')
 
+  // Mobile menu state
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
   // Dashboard state
   const [activeTab, setActiveTab] = useState('workouts')
   const [exercise, setExercise] = useState('Barbell Bench Press (Chest)')
@@ -86,7 +89,7 @@ export default function App() {
   }
 
   // ========================================================
-  // 1. FIRST PAGE: EXACT LOGIN DESIGN FROM IMAGE 1
+  // 1. LOGIN / SIGNUP PAGE
   // ========================================================
   if (!session) {
     return (
@@ -221,7 +224,7 @@ export default function App() {
                 </div>
               )}
 
-              {/* Email Address Input */}
+              {/* Email Input */}
               <div style={{ marginBottom: '18px' }}>
                 <label style={{
                   display: 'block',
@@ -368,7 +371,7 @@ export default function App() {
   }
 
   // ========================================================
-  // 2. MAIN DASHBOARD (AFTER LOGIN)
+  // 2. RESPONSIVE DASHBOARD (MOBILE & DESKTOP COMPATIBLE)
   // ========================================================
   return (
     <div style={{
@@ -376,255 +379,388 @@ export default function App() {
       backgroundColor: '#000000',
       color: '#ffffff',
       display: 'flex',
-      flexDirection: 'row',
+      flexDirection: 'column',
       fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     }}>
-      {/* Sidebar */}
-      <aside style={{
-        width: '260px',
-        borderRight: '1px solid #1f1f23',
-        padding: '24px',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        backgroundColor: '#050505',
-        flexShrink: 0
-      }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <h1 style={{ fontSize: '18px', fontWeight: '900', color: '#FFC107', fontStyle: 'italic', textTransform: 'uppercase', margin: 0 }}>
-              FITNESS DEAN
-            </h1>
-            <span style={{
-              backgroundColor: 'rgba(255, 193, 7, 0.15)',
-              border: '1px solid rgba(255, 193, 7, 0.3)',
-              padding: '2px 6px',
-              fontSize: '9px',
-              fontWeight: '900',
-              color: '#FFC107',
-              borderRadius: '4px'
-            }}>PRO</span>
-          </div>
-          <p style={{ fontSize: '10px', color: '#52525b', textTransform: 'uppercase', letterSpacing: '2px', marginTop: '4px', marginBottom: '32px' }}>
-            PORTAL V1.0
-          </p>
+      {/* CSS Styles injected for responsive layout without Tailwind */}
+      <style>{`
+        .app-container {
+          display: flex;
+          flex-direction: column;
+          min-height: 100vh;
+        }
+        .mobile-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 16px 20px;
+          background-color: #050505;
+          border-bottom: 1px solid #1f1f23;
+          position: sticky;
+          top: 0;
+          z-index: 40;
+        }
+        .app-sidebar {
+          position: fixed;
+          top: 0;
+          left: 0;
+          bottom: 0;
+          width: 260px;
+          background-color: #050505;
+          border-right: 1px solid #1f1f23;
+          padding: 24px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          z-index: 50;
+          transform: translateX(-100%);
+          transition: transform 0.3s ease-in-out;
+          box-sizing: border-box;
+        }
+        .app-sidebar.open {
+          transform: translateX(0);
+        }
+        .sidebar-overlay {
+          position: fixed;
+          inset: 0;
+          background-color: rgba(0, 0, 0, 0.7);
+          backdrop-filter: blur(4px);
+          z-index: 45;
+        }
+        .main-content {
+          flex: 1;
+          padding: 20px;
+          box-sizing: border-box;
+          width: 100%;
+        }
+        .input-grid {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 16px;
+        }
+        
+        /* Desktop styles (768px and above) */
+        @media (min-width: 768px) {
+          .app-container {
+            flex-direction: row !important;
+          }
+          .mobile-header {
+            display: none !important;
+          }
+          .app-sidebar {
+            position: static !important;
+            transform: none !important;
+            flex-shrink: 0;
+          }
+          .sidebar-overlay {
+            display: none !important;
+          }
+          .main-content {
+            padding: 32px !important;
+          }
+          .input-grid {
+            grid-template-columns: 1fr 1fr !important;
+          }
+        }
+      `}</style>
 
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            {[
-              { id: 'dashboard', label: 'DASHBOARD' },
-              { id: 'workouts', label: 'WORKOUT LOGGER' },
-              { id: 'catalog', label: 'EXERCISE CATALOG' },
-              { id: 'nutrition', label: 'NUTRITION & MACROS' },
-              { id: 'analytics', label: 'ANALYTICS & PRS' },
-              { id: 'profile', label: 'PROFILE & TARGETS' },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                style={{
-                  width: '100%',
-                  textAlign: 'left',
-                  padding: '12px 16px',
-                  borderRadius: '10px',
-                  fontWeight: '800',
-                  fontSize: '11px',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.8px',
-                  border: 'none',
-                  cursor: 'pointer',
-                  backgroundColor: activeTab === tab.id ? '#FFC107' : 'transparent',
-                  color: activeTab === tab.id ? '#000000' : '#a1a1aa',
-                  transition: 'all 0.2s'
-                }}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </nav>
+      {/* MOBILE TOP HEADER BAR */}
+      <header className="mobile-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <h1 style={{ fontSize: '16px', fontWeight: '900', color: '#FFC107', fontStyle: 'italic', textTransform: 'uppercase', margin: 0 }}>
+            FITNESS DEAN
+          </h1>
+          <span style={{
+            backgroundColor: 'rgba(255, 193, 7, 0.15)',
+            border: '1px solid rgba(255, 193, 7, 0.3)',
+            padding: '2px 6px',
+            fontSize: '9px',
+            fontWeight: '900',
+            color: '#FFC107',
+            borderRadius: '4px'
+          }}>PRO</span>
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '24px' }}>
-          <button style={{
-            padding: '12px',
-            borderRadius: '10px',
-            border: '1px solid rgba(255, 193, 7, 0.3)',
+        <button 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          style={{
+            background: 'none',
+            border: 'none',
             color: '#FFC107',
-            backgroundColor: 'transparent',
-            fontSize: '11px',
-            fontWeight: '800',
+            fontSize: '22px',
             cursor: 'pointer',
-            textTransform: 'uppercase'
-          }}>
-            SCAN QR FOR MOBILE
-          </button>
-          <button
-            onClick={() => supabase.auth.signOut()}
-            style={{
+            padding: '4px 8px'
+          }}
+        >
+          {isMobileMenuOpen ? '✕' : '☰'}
+        </button>
+      </header>
+
+      {/* MOBILE BACKDROP OVERLAY */}
+      {isMobileMenuOpen && (
+        <div 
+          className="sidebar-overlay" 
+          onClick={() => setIsMobileMenuOpen(false)} 
+        />
+      )}
+
+      <div className="app-container">
+        {/* SIDEBAR DRAWER */}
+        <aside className={`app-sidebar ${isMobileMenuOpen ? 'open' : ''}`}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h1 style={{ fontSize: '18px', fontWeight: '900', color: '#FFC107', fontStyle: 'italic', textTransform: 'uppercase', margin: 0 }}>
+                FITNESS DEAN
+              </h1>
+              <span style={{
+                backgroundColor: 'rgba(255, 193, 7, 0.15)',
+                border: '1px solid rgba(255, 193, 7, 0.3)',
+                padding: '2px 6px',
+                fontSize: '9px',
+                fontWeight: '900',
+                color: '#FFC107',
+                borderRadius: '4px'
+              }}>PRO</span>
+            </div>
+            <p style={{ fontSize: '10px', color: '#52525b', textTransform: 'uppercase', letterSpacing: '2px', marginTop: '4px', marginBottom: '32px' }}>
+              PORTAL V1.0
+            </p>
+
+            <nav style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {[
+                { id: 'dashboard', label: 'DASHBOARD' },
+                { id: 'workouts', label: 'WORKOUT LOGGER' },
+                { id: 'catalog', label: 'EXERCISE CATALOG' },
+                { id: 'nutrition', label: 'NUTRITION & MACROS' },
+                { id: 'analytics', label: 'ANALYTICS & PRS' },
+                { id: 'profile', label: 'PROFILE & TARGETS' },
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => {
+                    setActiveTab(tab.id)
+                    setIsMobileMenuOpen(false) // Close menu on tab click
+                  }}
+                  style={{
+                    width: '100%',
+                    textAlign: 'left',
+                    padding: '12px 16px',
+                    borderRadius: '10px',
+                    fontWeight: '800',
+                    fontSize: '11px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.8px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    backgroundColor: activeTab === tab.id ? '#FFC107' : 'transparent',
+                    color: activeTab === tab.id ? '#000000' : '#a1a1aa',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '24px' }}>
+            <button style={{
               padding: '12px',
               borderRadius: '10px',
-              border: '1px solid #27272a',
-              color: '#71717a',
+              border: '1px solid rgba(255, 193, 7, 0.3)',
+              color: '#FFC107',
               backgroundColor: 'transparent',
               fontSize: '11px',
               fontWeight: '800',
               cursor: 'pointer',
               textTransform: 'uppercase'
-            }}
-          >
-            SIGN OUT
-          </button>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main style={{ flex: 1, padding: '32px', backgroundColor: '#000000', overflowY: 'auto' }}>
-        {activeTab === 'workouts' && (
-          <div style={{ maxWidth: '720px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            
-            {/* Workout Form */}
-            <div style={{
-              backgroundColor: '#0c0c0e',
-              border: '1px solid #27272a',
-              borderRadius: '16px',
-              padding: '24px'
             }}>
-              <h2 style={{ fontSize: '20px', fontWeight: '900', color: '#FFC107', fontStyle: 'italic', textTransform: 'uppercase', margin: '0 0 4px 0' }}>
-                WORKOUT LOGGER
-              </h2>
-              <p style={{ fontSize: '12px', color: '#71717a', margin: '0 0 20px 0' }}>
-                Log your weight and reps to build training volume.
-              </p>
+              SCAN QR FOR MOBILE
+            </button>
+            <button
+              onClick={() => supabase.auth.signOut()}
+              style={{
+                padding: '12px',
+                borderRadius: '10px',
+                border: '1px solid #27272a',
+                color: '#71717a',
+                backgroundColor: 'transparent',
+                fontSize: '11px',
+                fontWeight: '800',
+                cursor: 'pointer',
+                textTransform: 'uppercase'
+              }}
+            >
+              SIGN OUT
+            </button>
+          </div>
+        </aside>
 
-              <form onSubmit={handleAddWorkout} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: '#a1a1aa', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px' }}>
-                    SELECT EXERCISE
-                  </label>
-                  <select
-                    value={exercise}
-                    onChange={(e) => setExercise(e.target.value)}
+        {/* MAIN CONTENT AREA */}
+        <main className="main-content">
+          {activeTab === 'workouts' && (
+            <div style={{ maxWidth: '720px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              
+              {/* Workout Form */}
+              <div style={{
+                backgroundColor: '#0c0c0e',
+                border: '1px solid #27272a',
+                borderRadius: '16px',
+                padding: '20px'
+              }}>
+                <h2 style={{ fontSize: '20px', fontWeight: '900', color: '#FFC107', fontStyle: 'italic', textTransform: 'uppercase', margin: '0 0 4px 0' }}>
+                  WORKOUT LOGGER
+                </h2>
+                <p style={{ fontSize: '12px', color: '#71717a', margin: '0 0 20px 0' }}>
+                  Log your weight and reps to build training volume.
+                </p>
+
+                <form onSubmit={handleAddWorkout} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: '#a1a1aa', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px' }}>
+                      SELECT EXERCISE
+                    </label>
+                    <select
+                      value={exercise}
+                      onChange={(e) => setExercise(e.target.value)}
+                      style={{
+                        width: '100%',
+                        backgroundColor: '#141416',
+                        border: '1px solid #27272a',
+                        borderRadius: '10px',
+                        padding: '12px 14px',
+                        fontSize: '13px',
+                        color: '#ffffff',
+                        outline: 'none',
+                        boxSizing: 'border-box'
+                      }}
+                    >
+                      {EXERCISES.map((ex, idx) => (
+                        <option key={idx} value={ex} style={{ backgroundColor: '#141416', color: '#fff' }}>{ex}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* RESPONSIVE INPUT GRID */}
+                  <div className="input-grid">
+                    <div>
+                      <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: '#a1a1aa', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px' }}>
+                        WEIGHT (KG)
+                      </label>
+                      <input
+                        type="number"
+                        placeholder="e.g. 80"
+                        value={weight}
+                        onChange={(e) => setWeight(e.target.value)}
+                        style={{
+                          width: '100%',
+                          backgroundColor: '#141416',
+                          border: '1px solid #27272a',
+                          borderRadius: '10px',
+                          padding: '12px 14px',
+                          fontSize: '13px',
+                          color: '#ffffff',
+                          outline: 'none',
+                          boxSizing: 'border-box'
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: '#a1a1aa', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px' }}>
+                        REPS COMPLETED
+                      </label>
+                      <input
+                        type="number"
+                        placeholder="e.g. 10"
+                        value={reps}
+                        onChange={(e) => setReps(e.target.value)}
+                        style={{
+                          width: '100%',
+                          backgroundColor: '#141416',
+                          border: '1px solid #27272a',
+                          borderRadius: '10px',
+                          padding: '12px 14px',
+                          fontSize: '13px',
+                          color: '#ffffff',
+                          outline: 'none',
+                          boxSizing: 'border-box'
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
                     style={{
                       width: '100%',
-                      backgroundColor: '#141416',
-                      border: '1px solid #27272a',
-                      borderRadius: '10px',
-                      padding: '12px 14px',
+                      backgroundColor: '#FFC107',
+                      color: '#000000',
+                      fontWeight: '900',
                       fontSize: '13px',
-                      color: '#ffffff',
-                      outline: 'none'
+                      textTransform: 'uppercase',
+                      padding: '14px',
+                      borderRadius: '10px',
+                      border: 'none',
+                      cursor: 'pointer',
+                      marginTop: '8px'
                     }}
                   >
-                    {EXERCISES.map((ex, idx) => (
-                      <option key={idx} value={ex} style={{ backgroundColor: '#141416', color: '#fff' }}>{ex}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: '#a1a1aa', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px' }}>
-                      WEIGHT (KG)
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="e.g. 80"
-                      value={weight}
-                      onChange={(e) => setWeight(e.target.value)}
-                      style={{
-                        width: '100%',
-                        backgroundColor: '#141416',
-                        border: '1px solid #27272a',
-                        borderRadius: '10px',
-                        padding: '12px 14px',
-                        fontSize: '13px',
-                        color: '#ffffff',
-                        outline: 'none',
-                        boxSizing: 'border-box'
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <label style={{ display: 'block', fontSize: '11px', fontWeight: '800', color: '#a1a1aa', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px' }}>
-                      REPS COMPLETED
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="e.g. 10"
-                      value={reps}
-                      onChange={(e) => setReps(e.target.value)}
-                      style={{
-                        width: '100%',
-                        backgroundColor: '#141416',
-                        border: '1px solid #27272a',
-                        borderRadius: '10px',
-                        padding: '12px 14px',
-                        fontSize: '13px',
-                        color: '#ffffff',
-                        outline: 'none',
-                        boxSizing: 'border-box'
-                      }}
-                    />
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  style={{
-                    width: '100%',
-                    backgroundColor: '#FFC107',
-                    color: '#000000',
-                    fontWeight: '900',
-                    fontSize: '13px',
-                    textTransform: 'uppercase',
-                    padding: '14px',
-                    borderRadius: '10px',
-                    border: 'none',
-                    cursor: 'pointer',
-                    marginTop: '8px'
-                  }}
-                >
-                  + LOG SET NOW
-                </button>
-              </form>
-            </div>
-
-            {/* History */}
-            <div style={{
-              backgroundColor: '#0c0c0e',
-              border: '1px solid #27272a',
-              borderRadius: '16px',
-              padding: '24px'
-            }}>
-              <h3 style={{ fontSize: '13px', fontWeight: '900', color: '#e4e4e7', fontStyle: 'italic', textTransform: 'uppercase', margin: '0 0 16px 0' }}>
-                LOGGED WORKOUT HISTORY
-              </h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {loggedWorkouts.map((item) => (
-                  <div key={item.id} style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    backgroundColor: '#141416',
-                    border: '1px solid #27272a',
-                    borderRadius: '12px',
-                    padding: '16px'
-                  }}>
-                    <div style={{ flex: 1 }}>
-                      <h4 style={{ margin: 0, fontWeight: '700', fontSize: '14px', color: '#ffffff' }}>{item.exercise}</h4>
-                      <p style={{ margin: '4px 0 0 0', fontSize: '11px', color: '#71717a' }}>{item.date}</p>
-                    </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <span style={{ color: '#FFC107', fontWeight: '900', fontSize: '16px' }}>{item.weight} kg</span>
-                      <span style={{ color: '#a1a1aa', fontSize: '13px', marginLeft: '8px' }}>× {item.reps} reps</span>
-                    </div>
-                  </div>
-                ))}
+                    + LOG SET NOW
+                  </button>
+                </form>
               </div>
-            </div>
 
-          </div>
-        )}
-      </main>
+              {/* Workout History */}
+              <div style={{
+                backgroundColor: '#0c0c0e',
+                border: '1px solid #27272a',
+                borderRadius: '16px',
+                padding: '20px'
+              }}>
+                <h3 style={{ fontSize: '13px', fontWeight: '900', color: '#e4e4e7', fontStyle: 'italic', textTransform: 'uppercase', margin: '0 0 16px 0' }}>
+                  LOGGED WORKOUT HISTORY
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {loggedWorkouts.map((item) => (
+                    <div key={item.id} style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      backgroundColor: '#141416',
+                      border: '1px solid #27272a',
+                      borderRadius: '12px',
+                      padding: '14px 16px',
+                      boxSizing: 'border-box'
+                    }}>
+                      <div style={{ flex: 1, paddingRight: '12px' }}>
+                        <h4 style={{ margin: 0, fontWeight: '700', fontSize: '14px', color: '#ffffff' }}>{item.exercise}</h4>
+                        <p style={{ margin: '4px 0 0 0', fontSize: '11px', color: '#71717a' }}>{item.date}</p>
+                      </div>
+                      <div style={{ textAlign: 'right', whitespace: 'nowrap' }}>
+                        <span style={{ color: '#FFC107', fontWeight: '900', fontSize: '15px' }}>{item.weight} kg</span>
+                        <span style={{ color: '#a1a1aa', fontSize: '12px', marginLeft: '6px' }}>× {item.reps} reps</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+          )}
+
+          {activeTab !== 'workouts' && (
+            <div style={{
+              padding: '40px 20px',
+              textAlign: 'center',
+              color: '#71717a',
+              border: '1px dashed #27272a',
+              borderRadius: '16px'
+            }}>
+              This section is coming soon.
+            </div>
+          )}
+        </main>
+      </div>
     </div>
   )
 }
