@@ -1,6 +1,15 @@
 import { useState, useEffect } from 'react'
 import { supabase } from './supabaseClient'
 
+const EXERCISES = [
+  'Barbell Bench Press (Chest)',
+  'Incline Dumbbell Press (Chest)',
+  'Barbell Squat (Legs)',
+  'Romanian Deadlift (Legs)',
+  'Overhead Press (Shoulders)',
+  'Lat Pulldown (Back)',
+]
+
 export default function App() {
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -22,15 +31,6 @@ export default function App() {
     { id: 1, exercise: 'Barbell Squat', weight: '120', reps: '5', date: 'Today' },
     { id: 2, exercise: 'Incline Dumbbell Press', weight: '32', reps: '8', date: 'Yesterday' }
   ])
-
-  const EXERCISES = [
-    'Barbell Bench Press (Chest)',
-    'Incline Dumbbell Press (Chest)',
-    'Barbell Squat (Legs)',
-    'Romanian Deadlift (Legs)',
-    'Overhead Press (Shoulders)',
-    'Lat Pulldown (Back)',
-  ]
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -83,7 +83,7 @@ export default function App() {
         fontWeight: '900',
         letterSpacing: '2px'
       }}>
-        LOADING FITNESS DEAN...
+        LOADING FITNESS DEN...
       </div>
     )
   }
@@ -121,7 +121,7 @@ export default function App() {
               alignItems: 'center',
               gap: '6px'
             }}>
-              ⚡ FITNESS DEAN GYM
+              ⚡ FITNESS DEN GYM
             </span>
           </div>
 
@@ -242,7 +242,7 @@ export default function App() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="athlete@fitnessdean.com"
+                  placeholder="athlete@fitnessden.com"
                   style={{
                     width: '100%',
                     backgroundColor: '#141416',
@@ -329,7 +329,7 @@ export default function App() {
                   marginTop: '6px'
                 }}
               >
-                ENTER FITNESS DEAN GYM
+                ENTER FITNESS DEN GYM
               </button>
             </form>
 
@@ -360,7 +360,7 @@ export default function App() {
               textAlign: 'center',
               fontSize: '11px'
             }}>
-              <span style={{ color: '#FFC107', fontWeight: '800' }}>Fitness Dean Perks: </span>
+              <span style={{ color: '#FFC107', fontWeight: '800' }}>Fitness Den Perks: </span>
               <span style={{ color: '#a1a1aa' }}>24/7 Access • Heavy Iron • Personal Coaching</span>
             </div>
 
@@ -382,7 +382,7 @@ export default function App() {
       flexDirection: 'column',
       fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     }}>
-      {/* CSS Styles injected for responsive layout without Tailwind */}
+      {/* CSS Styles injected for responsive layout */}
       <style>{`
         .app-container {
           display: flex;
@@ -468,7 +468,7 @@ export default function App() {
       <header className="mobile-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <h1 style={{ fontSize: '16px', fontWeight: '900', color: '#FFC107', fontStyle: 'italic', textTransform: 'uppercase', margin: 0 }}>
-            FITNESS DEAN
+            FITNESS DEN
           </h1>
           <span style={{
             backgroundColor: 'rgba(255, 193, 7, 0.15)',
@@ -510,7 +510,7 @@ export default function App() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <h1 style={{ fontSize: '18px', fontWeight: '900', color: '#FFC107', fontStyle: 'italic', textTransform: 'uppercase', margin: 0 }}>
-                FITNESS DEAN
+                FITNESS DEN
               </h1>
               <span style={{
                 backgroundColor: 'rgba(255, 193, 7, 0.15)',
@@ -539,7 +539,7 @@ export default function App() {
                   key={tab.id}
                   onClick={() => {
                     setActiveTab(tab.id)
-                    setIsMobileMenuOpen(false) // Close menu on tab click
+                    setIsMobileMenuOpen(false)
                   }}
                   style={{
                     width: '100%',
@@ -736,7 +736,7 @@ export default function App() {
                         <h4 style={{ margin: 0, fontWeight: '700', fontSize: '14px', color: '#ffffff' }}>{item.exercise}</h4>
                         <p style={{ margin: '4px 0 0 0', fontSize: '11px', color: '#71717a' }}>{item.date}</p>
                       </div>
-                      <div style={{ textAlign: 'right', whitespace: 'nowrap' }}>
+                      <div style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
                         <span style={{ color: '#FFC107', fontWeight: '900', fontSize: '15px' }}>{item.weight} kg</span>
                         <span style={{ color: '#a1a1aa', fontSize: '12px', marginLeft: '6px' }}>× {item.reps} reps</span>
                       </div>
